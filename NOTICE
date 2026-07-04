@@ -1,0 +1,70 @@
+Low-Stack HAETAE — Artifact
+Third-party attributions and licensing notice
+================================================================================
+
+The Apache License 2.0 in the file LICENSE (Copyright 2026 YoungBeom Kim,
+Christine van Vredendaal, Gustavo Banegas, and Seog Chung Seo) applies to the
+source files (`.c`/`.h`/`.S`) we authored or modified as part of this work;
+those files carry the Apache 2.0 license header at the top. The build scripts,
+Dockerfile, and linker scripts are likewise our work and covered by the Apache
+2.0 license, even though they do not each carry the header.
+
+This artifact also includes code from third parties, retained either unmodified
+or used as the basis of our work. Those components remain under their original
+licenses and are NOT relicensed under our Apache 2.0 license. They are listed below.
+
+
+1. HAETAE reference implementation
+--------------------------------------------------------------------------------
+This work builds on the HAETAE digital signature reference implementation by
+the HAETAE team (CryptoLab) and its Cortex-M4 port in pqm4
+(https://github.com/mupq/pqm4). The files listed here are included UNMODIFIED
+from the HAETAE reference (verified byte-identical against those upstream
+sources) and
+remain the work of the HAETAE authors, under the original HAETAE license:
+
+  api.h            ntt.c          poly_sparsemul.h    sign.h
+  arm_simd.h       ntt.h          randombytes.c       stack_profile.c
+  decompose.c      ntt332.h       randombytes.h       stack_profile.h
+  decompose.h      ntt332.S       reduce.c            symmetric.h
+  fast_exp_asm.h   m4.h           reduce.h            symmetric-shake.c
+  fast_exp_asm.S   params.h       fixpoint.c          utils.c
+  fast_sampler.S   polymat.c      fixpoint.h          utils.h
+  fpa.h            polymat.h      verify.h
+
+These files are left as-is (no Apache 2.0 header). Classification is per file and
+per port: a given basename may be byte-identical to the HAETAE reference in one
+port (no header, listed above) yet modified for our low-stack / streaming work in
+another port (and there it carries our Apache 2.0 header). The authoritative
+signal is the presence or absence of the Apache 2.0 header at the top of each
+individual file.
+
+
+2. SHA-3 / SHAKE (Keccak) — fips202.c, fips202.h
+--------------------------------------------------------------------------------
+Public domain. Based on the public-domain implementation in
+crypto_hash/keccakc512/simple/ from SUPERCOP by Ronny Van Keer, and the
+public-domain "TweetFips202" implementation by Gilles Van Assche,
+Daniel J. Bernstein, and Peter Schwabe.
+(Also: qemu/common/fips202.{c,h}.)
+
+
+3. rANS entropy coder — rans_byte.h
+--------------------------------------------------------------------------------
+Public domain. Simple byte-aligned rANS encoder/decoder by
+Fabian 'ryg' Giesen, 2014.
+
+
+4. CMSIS and MPS2 platform support — qemu/common/mps2/*
+--------------------------------------------------------------------------------
+Apache License 2.0, Copyright ARM Limited (and affiliates). Includes the CMSIS
+core headers (core_cm4.h, cmsis_*.h, CMSDK_CM4.h, mpu_armv7.h, ...), the MPS2
+startup code (startup_MPS2.S), and linker/memory layout (MPS2.ld,
+memory_zones.h). Full text in qemu/common/mps2/LICENSE.txt.
+
+
+5. simavr MCU section helper — avr/avr_mcu_section.h
+--------------------------------------------------------------------------------
+GNU General Public License v3 (or later), Copyright 2008-2013 Michel Pollet
+<buserror@gmail.com>. Part of the simavr AVR simulator. Used only as a
+build-time helper for the AVR target; see the file header for full terms.

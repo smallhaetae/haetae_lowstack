@@ -1,0 +1,48 @@
+Low-Stack HAETAE — pqm4 / mupq integration: third-party attributions
+====================================================================
+
+This bundle combines our low-stack HAETAE implementations with the pqm4 / mupq
+benchmarking framework. Components remain under their respective licenses.
+
+1. Our contribution (Apache-2.0)
+--------------------------------
+The HAETAE low-stack implementation files under
+    crypto_sign/haetae{2,3,5}/C/
+    crypto_sign/haetae{2,3,5}/asm/
+that we authored or modified for this work carry an Apache 2.0 license header at
+the top of the file (see any such file, e.g. sign_passes.c, encoding.c, keygen.c,
+verify.c). Files that are verbatim from the upstream HAETAE reference, or are
+third-party headers, do not carry our header and are covered by their own
+license (see below). Presence of the Apache 2.0 header is authoritative.
+
+2. pqm4 / mupq framework (Apache-2.0 or CC0-1.0)
+------------------------------------------------
+The build system, test/benchmark harnesses and platform support — Makefile,
+mk/, mupq/ (mupq.py, platforms.py, mk/, common/, crypto_sign/ harness sources),
+common/, ldscripts/, benchmarks.py, test.py, interface.py, st_nucleo_l4r5.cfg —
+are from the pqm4 project and remain under "Apache-2.0 or CC0-1.0" (the SPDX tag
+carried in those files). Upstream: https://github.com/mupq/pqm4 (and its mupq
+submodule https://github.com/mupq/mupq).
+
+3. SHA-3 / SHAKE / Keccak, AES, NIST seed expander
+--------------------------------------------------
+common/keccakf1600.{c,S}, mupq/common/fips202.{c,h},
+mupq/pqclean/common/{fips202,aes,sha2,sp800-185,nistseedexpander,...} and the
+shared headers symlinked from mupq/common/ are from pqm4/PQClean and are public
+domain / CC0 (or as stated in each file).
+
+4. rANS coder
+-------------
+crypto_sign/haetae*/{C,asm}/rans_byte.h is the public-domain rANS implementation
+by Fabian Giesen.
+
+5. CMSIS / MPS2 platform support
+--------------------------------
+common/mps2/* (startup, linker script, system support for the QEMU MPS2 target)
+is ARM CMSIS / MPS2 material under Apache-2.0.
+
+6. HAETAE reference
+-------------------
+The HAETAE scheme and its reference implementation are by the HAETAE team
+(CryptoLab); the Cortex-M4 reference port is from pqm4. Unmodified reference
+files are left under their original licensing.
