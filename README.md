@@ -10,6 +10,19 @@ It contains the full source of our low-stack HAETAE implementation, the
 assembly-optimized variants for low-end microcontrollers, and scripts that
 build (and, where no board is required, **run**) each target.
 
+> **HAETAE 1.2.0 version in pqm4.** The code here is the code measured in the
+> paper. It follows HAETAE v3.0 and is kept unchanged, so that the paper's
+> tables can be reproduced. The Cortex-M4 implementation, ported to HAETAE
+> 1.2.0, is part of [pqm4](https://github.com/mupq/pqm4) as `m4fstack`
+> ([haetae2](https://github.com/mupq/pqm4/tree/master/crypto_sign/haetae2/m4fstack),
+> [haetae3](https://github.com/mupq/pqm4/tree/master/crypto_sign/haetae3/m4fstack),
+> [haetae5](https://github.com/mupq/pqm4/tree/master/crypto_sign/haetae5/m4fstack);
+> [mupq/pqm4#420](https://github.com/mupq/pqm4/pull/420)). Its outputs are
+> byte-identical to the HAETAE 1.2.0 reference implementation, and its README
+> lists the changes with respect to this artifact. Its stack and cycle counts
+> therefore differ from the paper's tables; the pqm4 numbers are in pqm4's
+> [`benchmarks.md`](https://github.com/mupq/pqm4/blob/master/benchmarks.md).
+
 ---
 
 ## 1. What this artifact demonstrates
