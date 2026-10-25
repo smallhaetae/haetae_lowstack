@@ -11,8 +11,8 @@ assembly-optimized variants for low-end microcontrollers, and scripts that
 build (and, where no board is required, **run**) each target.
 
 > **HAETAE 1.2.0 version in pqm4.** The code here is the code measured in the
-> paper. It follows HAETAE v3.0 and is kept unchanged, so that the paper's
-> tables can be reproduced. The Cortex-M4 implementation, ported to HAETAE
+> paper (commit `080d282`), with only the fixes of the patch notes below applied.
+> It follows HAETAE v3.0. The Cortex-M4 implementation, ported to HAETAE
 > 1.2.0, is part of [pqm4](https://github.com/mupq/pqm4) as `m4fstack`
 > ([haetae2](https://github.com/mupq/pqm4/tree/master/crypto_sign/haetae2/m4fstack),
 > [haetae3](https://github.com/mupq/pqm4/tree/master/crypto_sign/haetae3/m4fstack),
@@ -22,6 +22,71 @@ build (and, where no board is required, **run**) each target.
 > lists the changes with respect to this artifact. Its stack and cycle counts
 > therefore differ from the paper's tables; the pqm4 numbers are in pqm4's
 > [`benchmarks.md`](https://github.com/mupq/pqm4/blob/master/benchmarks.md).
+
+> **Patch notes (2026-10-26, security-related fix).** In `cortex-m0plus/` and `avr/`,
+> `polyfix_addmul_ntt_inplace_acc2()` (HAETAE-5 signing, pass B) used the
+> output of the Barrett inverse NTT, which lies in [0, q), as the signed
+> product c·s. Both the C and the assembly Barrett paths (including
+> `HAETAE_FORCE_C_NTT`) are affected. The rejection test therefore ran on wrong
+> values: the ‖2z−y‖² test never rejected and the ‖z‖² test was decided by an
+> overflowed sum. In our instrumented runs about 40 % of the signing attempts
+> were accepted instead of about 17 % (the rates depend on the key and the
+> messages). The packed signatures are correct and verify, but they were not
+> rejection-sampled as the specification requires, so the security argument
+> does not apply to them: the affected signing code must not be used, and keys
+> that were used with it should be replaced as a precaution. We have not
+> established a practical key-recovery attack. HAETAE-2 and -3, key generation,
+> verification, the Montgomery-based Cortex-M4 and MSP430 signing paths and the
+> pqm4 version do not have this defect; the AVR port ships the signing source,
+> but its supplied build and test scenarios measure verification only.
+> Fixed in `4949846` (reported by Ben Stephens, Deakin University). `529fb9a`
+> also removes an inverted early exit in pass B, placed before the secret
+> products are accumulated, that could only cause extra rejections and did not
+> trigger in any of our instrumented runs. `9e9c43d` fixes the Cortex-M0+
+> measurement harness: the vector table was dropped under `-flto` (the default
+> of `scripts/build_m0p.sh`), so those images did not boot; the SysTick cycle
+> counter of `test/cycle.h` added 2^24 cycles to about half of the samples
+> longer than 0.35 s (it tested COUNTFLAG, which the handler does not clear)
+> and wrapped after 2^32 cycles (89 s); and the signing benchmark left the last
+> 10 bytes of its message uninitialised. The code as published with the paper
+> is commit `080d282`.
+>
+> **Table 6 of the paper (NUCLEO-C031C6).** The HAETAE-5 (asm) signing figure
+> was measured with the signing defect, and all key-generation and signing
+> cycle counts of the table were taken with the faulty counter; the message
+> set of the published signing runs cannot be reconstructed. We re-measured
+> the twelve key-generation and signing cells with the fixed code and the
+> corrected harness under the paper's conditions — arm-none-eabi-gcc 14.2.1,
+> `-Os` without `-flto`, 48 MHz, upper median (sorted sample [50]) of 100 runs;
+> (C) = the Montgomery-NTT C port from which the (asm) port was derived,
+> (asm) = this repository — and these values replace the published ones:
+>
+> | | Impl. | KeyGen cycles (published) | Sign cycles (published) |
+> |---|---|---|---|
+> | HAETAE-2 | (C) | 51,412 K (66,191 K) | 528,030 K (318,888 K) |
+> | | (asm) | 42,260 K (53,093 K) | 519,696 K (387,619 K) |
+> | HAETAE-3 | (C) | 85,699 K (102,646 K) | 855,101 K (851,868 K) |
+> | | (asm) | 68,342 K (85,287 K) | 834,384 K (835,638 K) |
+> | HAETAE-5 | (C) | 63,777 K (74,318 K) | 1,056,488 K (728,614 K) |
+> | | (asm) | 59,469 K (65,700 K) | 1,016,411 K (374,542 K) |
+>
+> The milliseconds follow from the cycles at 48 MHz. Key generation runs a
+> deterministic sequence; measured with the published counter it exceeds the
+> corrected counter by 2^24 cycles in 53 of 100 runs and agrees within 20
+> cycles otherwise, so the KeyGen changes are the counter correction. Of the
+> signing changes only HAETAE-5 (asm) is due to the signing defect; the other
+> signing cells are a new sample (100 fully initialised messages, corrected
+> counter) and differ from the published medians also by the sampling
+> variability of a 100-run median, whose rejection-sampling attempt counts are
+> small integers. The verification counts (below one counter wrap) reproduce
+> the published ones within 0.4 % and are kept, as are the stack and flash
+> entries; the peak signing stack of HAETAE-5 (asm) is 11,992 bytes for both
+> the published and the fixed code in this re-measurement (published 12,048),
+> and rebuilt images differ in size from the published ones by a few tens of
+> bytes. The raw values of every run, the build recipe and the hash of the
+> Montgomery-C sources are in `cortex-m0plus/results-2026-10-26/`. The MSP430
+> port (Table 7) was not re-measured; its harness stores the cycle count in
+> 32 bits, and we are re-checking those figures separately.
 
 ---
 
