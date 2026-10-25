@@ -27,7 +27,7 @@
 
 int main(void)
 {
-    uint32_t cycles[NUM_RUNS];
+    uint64_t cycles[NUM_RUNS];
 
     uart_init();
     cycle_init();
@@ -50,10 +50,13 @@ int main(void)
         }
     }
 
-    sort_u32(cycles, NUM_RUNS);
-    uart_puts("Min: "); uart_print_u32(cycles[0]); uart_println(" cycles");
-    uart_puts("Median: "); uart_print_u32(cycles[NUM_RUNS / 2]); uart_println(" cycles");
-    uart_puts("Max: "); uart_print_u32(cycles[NUM_RUNS - 1]); uart_println(" cycles");
+    uart_puts("RAW:");
+    for (int i = 0; i < NUM_RUNS; i++) { uart_putchar(' '); uart_print_u64(cycles[i]); }
+    uart_putchar('\n');
+    sort_u64(cycles, NUM_RUNS);
+    uart_puts("Min: "); uart_print_u64(cycles[0]); uart_println(" cycles");
+    uart_puts("Median: "); uart_print_u64(cycles[NUM_RUNS / 2]); uart_println(" cycles");
+    uart_puts("Max: "); uart_print_u64(cycles[NUM_RUNS - 1]); uart_println(" cycles");
 
     uart_println("=== Done ===");
 halt:

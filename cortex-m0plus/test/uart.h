@@ -94,6 +94,15 @@ static void uart_print_u32(uint32_t v) {
     uart_puts(&buf[i]);
 }
 
+static void uart_print_u64(uint64_t v) {
+    char buf[21];
+    int i = 20;
+    buf[i] = 0;
+    if (v == 0) { uart_putchar('0'); return; }
+    while (v) { buf[--i] = '0' + (v % 10); v /= 10; }
+    uart_puts(&buf[i]);
+}
+
 static void uart_println(const char *s) {
     uart_puts(s);
     uart_putchar('\n');

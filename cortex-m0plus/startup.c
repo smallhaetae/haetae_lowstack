@@ -46,7 +46,7 @@ void PendSV_Handler(void)     __attribute__((weak, alias("Default_Handler")));
 void SysTick_Handler(void)    __attribute__((weak, alias("Default_Handler")));
 
 /* Vector table */
-__attribute__((section(".isr_vector")))
+__attribute__((used, section(".isr_vector")))
 const uint32_t vectors[] = {
     (uint32_t)&_estack,          /* Initial SP */
     (uint32_t)Reset_Handler,
