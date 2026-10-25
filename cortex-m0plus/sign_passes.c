@@ -91,6 +91,14 @@ polyfix_addmul_ntt_inplace_acc2(polyfix *z,
     poly_ntt(s);
     poly_pointwise_montgomery(s, c_ntt, s);
     poly_invntt_tomont(s);
+    /* invntt_tomont returns standard representatives in [0, Q); the exact
+     * c*s is small (|c*s| <= TAU*ETA), so centre to (-Q/2, Q/2] without a
+     * secret-dependent branch. */
+    for (unsigned j = 0; j < N; ++j) {
+        const int32_t v = s->coeffs[j];
+        const uint32_t sub = (uint32_t)((int32_t)((Q - 1) / 2) - v) >> 31;
+        s->coeffs[j] = v - (int32_t)(sub * (uint32_t)Q);
+    }
 
     for (unsigned j = 0; j < N; ++j) {
         const int32_t y = z->coeffs[j];
