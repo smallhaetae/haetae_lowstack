@@ -327,9 +327,6 @@ fs_passB_check_streaming(const poly *c,
     /* EE-1: early exit after z1[0] — no secret key involved, CT-safe */
     if (acc1 > bound1) return 1;
 
-    /* EE-3: early exit on acc2 saturation + b' bit */
-    if (acc2 >= bound0 && ((b & 0x2) >> 1)) return 1;
-
 #if (HAETAE_MODE == 5)
     /* Precompute NTT of challenge into shared buffer. */
     poly *c_ntt = shared;
